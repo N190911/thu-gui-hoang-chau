@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#dceeff">
+<title>Gửi Châu ♡</title>
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+  --blue: #77a9e5;
+  --deep: #315b91;
+  --pale: #eaf4ff;
+  --paper: #fffaf2;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  font-family: Arial, "Segoe UI", sans-serif;
+  color: var(--deep);
+  background:
+    radial-gradient(ellipse at 10% 10%, #fff 0%, transparent 35%),
+    linear-gradient(145deg, #fceef4, #eaf5ff 55%, #cfeaff);
+}
+
+.scene {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.heading {
+  margin-bottom: 22px;
+  animation: bob 3s ease-in-out infinite;
+}
+
+.kicker {
+  font: 700 .7rem Arial, sans-serif;
+  letter-spacing: .2em;
+  color: #7198c5;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-weight: normal;
+  margin: 10px 0;
+}
+
+.heading p {
+  font-style: italic;
+  margin: 0;
+  color: #668bb7;
+}
+
+/* PHONG BÌ */
+.stage {
+  width: min(500px, 91vw);
+  height: 300px;
+  position: relative;
+  perspective: 1000px;
+  margin-top: 5px;
+}
+
+.envelope {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  height: 225px;
+  border-radius: 10px 10px 18px 18px;
+  background: #c7def9;
+  box-shadow: 0 18px 30px #547eaa25;
+  isolation: isolate;
+}
+
+/* Tờ giấy được giữ gọn bên trong phong bì */
+.paper {
+  position: absolute;
+  z-index: 1;
+  left: 9%;
+  width: 82%;
+  top: 12px;
+  height: 190px;
+  border-radius: 8px;
+  border: 1px solid #d4e4f6;
+  background: linear-gradient(#fffdf8, #fff5eb);
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  font-size: 1.5rem;
+  color: #6998cf;
+  transform: translateY(0);
+  transition: transform 1s cubic-bezier(.2,.8,.2,1);
+}
+
+.back {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #dcecff, #b5d3f5);
+  z-index: 0;
+}
+
+/* Nắp phong bì */
+.flap {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 125px;
+  background: linear-gradient(145deg, #a9cbed, #d8e9ff);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transform: rotateX(0);
+  transition: transform .8s ease;
+  backface-visibility: visible;
+}
+
+/* Các mặt gấp phía trước che mép giấy */
+.left-fold, .right-fold, .bottom-fold {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.left-fold {
+  z-index: 3;
+  background: #d7e8fc;
+  clip-path: polygon(0 0, 52% 55%, 0 100%);
+}
+
+.right-fold {
+  z-index: 3;
+  background: #bcd8f8;
+  clip-path: polygon(100% 0, 48% 55%, 100% 100%);
+}
+
+.bottom-fold {
+  z-index: 4;
+  background: linear-gradient(145deg, #edf6ff, #c6defb);
+  clip-path: polygon(0 100%, 50% 48%, 100% 100%);
+}
+
+.seal {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 49%;
+  transform: translate(-50%, -50%);
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #f7fbff;
+  border-radius: 50%;
+  background: #6399d8;
+  color: white;
+  font-size: 1.8rem;
+  box-shadow: 0 5px 12px #507eb444;
+  transition: opacity .35s, transform .4s;
+}
+
+.sticker {
+  position: absolute;
+  z-index: 7;
+  right: -4px;
+  bottom: -5px;
+  padding: 11px 15px;
+  background: #fffaf2;
+  border: 1px solid #f0dce8;
+  border-radius: 7px;
+  transform: rotate(4deg);
+  font-style: italic;
+  box-shadow: 0 5px 10px #527ba51c;
+}
+
+/* Hiệu ứng mở phong bì */
+.scene.opening .flap {
+  transform: rotateX(180deg);
+  z-index: 0;
+}
+
+.scene.opening .paper {
+  transform: translateY(-145px) rotate(-2deg);
+  z-index: 2;
+}
+
+.scene.opening .seal {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.3) rotate(35deg);
+}
+
+.scene.opening .sticker {
+  animation: stickerFly .5s ease forwards;
+}
+
+@keyframes stickerFly {
+  to {
+    opacity: 0;
+    transform: translate(35px, 20px) rotate(18deg) scale(.7);
+  }
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.open-btn {
+  margin-top: 20px;
+  padding: 14px 25px;
+  border: 0;
+  border-radius: 99px;
+  background: #5689c7;
+  color: white;
+  font: 700 .95rem Arial, sans-serif;
+  box-shadow: 0 6px 0 #315b91;
+  transition: transform .2s;
+}
+
+.open-btn:hover { transform: translateY(-2px); }
+.open-btn:active { transform: translateY(3px); }
+
+.hint {
+  margin-top: 15px;
+  font-style: italic;
+  color: #7195bd;
+  font-size: .9rem;
+}
+
+/* LÁ THƯ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: #213c6085;
+  backdrop-filter: blur(6px);
+}
+
+.overlay.show {
+  display: flex;
+  animation: fadeIn .3s ease;
+}
+
+.overlay.closing {
+  display: flex;
+  animation: fadeOut .3s forwards;
+}
+
+.card {
+  position: relative;
+  width: min(650px, 100%);
+  max-height: 88vh;
+  max-height: 88dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 36px clamp(20px, 5vw, 44px) 28px;
+  border: 2px solid #c9def5;
+  border-radius: 18px;
+  background: linear-gradient(150deg, #fffdf8, #fff5ed);
+  box-shadow: 0 25px 80px #182e4c55;
+  overflow-wrap: break-word;
+  animation: paperOpen .7s cubic-bezier(.2,.8,.2,1);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px dashed #aac8e9;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.close {
+  position: sticky;
+  float: right;
+  top: 0;
+  z-index: 2;
+  width: 35px;
+  height: 35px;
+  margin-top: -24px;
+  margin-right: -20px;
+  border: 0;
+  border-radius: 50%;
+  background: #dcecff;
+  color: #315b91;
+  font-size: 1.4rem;
+}
+
+.card-head {
+  text-align: center;
+  padding: 4px 10px 12px;
+}
+
+.card h2 {
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  line-height: 1.3;
+  font-weight: normal;
+  margin: 12px 0;
+}
+
+.rule {
+  width: 85px;
+  height: 3px;
+  background: #91b9e6;
+  border-radius: 5px;
+  margin: 0 auto 20px;
+}
+
+.card p {
+  position: relative;
+  margin: 12px 0;
+  color: #355b8d;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.card p.reveal {
+  opacity: 1 !important;
+transform: none !important;
+animation: none !important;
+visibility: visible !important;
+}
+
+.card p:nth-of-type(1) { animation-delay: .2s; }
+.card p:nth-of-type(2) { animation-delay: .6s; }
+.card p:nth-of-type(3) { animation-delay: 1s; }
+.card p:nth-of-type(4) { animation-delay: 1.4s; }
+.card p:nth-of-type(5) { animation-delay: 1.8s; }
+.card p:nth-of-type(6) { animation-delay: 2.2s; }
+.card p:nth-of-type(7) { animation-delay: 2.6s; }
+
+.signature {
+  text-align: right;
+  font-style: italic;
+}
+
+.footer {
+  margin-top: 18px;
+  text-align: center;
+  color: #7398c2;
+  font-style: italic;
+  font-size: .9rem;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+
+@keyframes paperOpen {
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateX(40deg) translateY(25px) scale(.94);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(900px) rotateX(0) translateY(0) scale(1);
+  }
+}
+
+.overlay.closing .card {
+  animation: paperClose .3s forwards;
+}
+
+@keyframes paperClose {
+  to {
+    opacity: 0;
+    transform: perspective(900px) rotateX(40deg) translateY(25px) scale(.94);
+  }
+}
+
+/* Trái tim và hoa bay */
+.float {
+  position: fixed;
+  z-index: 30;
+  bottom: -35px;
+  pointer-events: none;
+  animation: rise linear forwards;
+}
+
+@keyframes rise {
+  0% { transform: translateY(0) rotate(0) scale(.7); opacity: 0; }
+  15% { opacity: .9; }
+  85% { opacity: .7; }
+  100% { transform: translateY(-115vh) rotate(260deg) scale(1.2); opacity: 0; }
+}
+
+/* Lấp lánh */
+.sparkle {
+  position: fixed;
+  z-index: 2;
+  pointer-events: none;
+  animation: sparkle 1.2s ease-out forwards;
+}
+
+@keyframes sparkle {
+  0% { opacity: 0; transform: scale(.2) rotate(0); }
+  40% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+  100% { opacity: 0; transform: scale(.2) rotate(90deg); }
+}
+
+/* Sóng nước */
+.waves {
+  position: fixed;
+  left: -10%;
+  right: -10%;
+  bottom: -35px;
+  height: 75px;
+  z-index: -1;
+  opacity: .45;
+  border-radius: 50% 50% 0 0;
+  background: #a6d4f5;
+  animation: wave 6s ease-in-out infinite alternate;
+}
+
+@keyframes wave {
+  from { transform: translateX(-3%) rotate(-2deg); }
+  to { transform: translateX(3%) rotate(2deg); }
+}
+
+@media (max-width: 480px) {
+  .scene { padding: 20px 13px 28px; }
+  .stage { height: 270px; width: 94vw; }
+  .envelope { height: 205px; }
+  .paper { height: 170px; }
+  .scene.opening .paper { transform: translateY(-125px) rotate(-2deg); }
+  .card { padding: 35px 20px 25px; }
+  .card p { font-size: .96rem; line-height: 1.72; visibility: visible !important; }
+  .close { margin-right: -12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="waves"></div>
+
+<main class="scene" id="scene">
+  <header class="heading">
+    <div class="kicker">a little letter for you ♡</div>
+    <h1>Gửi Châu 🩵</h1>
+    <p>Một lời chúc nhỏ dành cho cô gái đặc biệt</p>
+  </header>
+
+  <section class="stage" aria-label="Phong bì thư">
+    <div class="envelope">
+      <div class="back"></div>
+      <div class="paper">♡</div>
+      <div class="flap"></div>
+      <div class="left-fold"></div>
+      <div class="right-fold"></div>
+      <div class="bottom-fold"></div>
+      <div class="seal">♡</div>
+      <div class="sticker">Cố lên nhé! 🌸</div>
+    </div>
+  </section>
+
+  <button class="open-btn" id="openBtn">Mở thư của tớ ♡</button>
+  <div class="hint">Bấm vào để nhận lời chúc nha</div>
+</main>
+
+<div class="overlay" id="overlay" role="dialog"
+     aria-modal="true" aria-labelledby="letterTitle">
+  <article class="card">
+    <button class="close" id="closeBtn" aria-label="Đóng thư">×</button>
+
+    <div class="card-head">
+      <div class="kicker">for my favorite person · 20/10</div>
+      <h2 id="letterTitle">Gửi Châu 🩵</h2>
+      <div class="rule"></div>
+    </div>
+
+    <p class="reveal">Ngày 20/10, chúc cậu thi bơi thật tốt nha! Mong cậu luôn bình tĩnh, tự tin, giữ vững phong độ và đạt được kết quả như mong muốn. Cứ tin vào bản thân và cố gắng hết sức mình nhé.</p>
+
+    <p class="reveal">Chúc cậu thi đấu thuận buồm xuôi gió, bơi thật tốt, gặp nhiều may mắn và mang về thành tích khiến chính cậu cũng phải tự hào. Nếu hơi hồi hộp thì hít thở sâu một chút nha, đừng tự tạo áp lực cho mình quá.</p>
+
+    <p class="reveal">Thi xong nhớ nghỉ ngơi, uống đủ nước, ăn uống đầy đủ và ngủ đủ giấc đó. Nhớ khởi động kỹ, giữ gìn sức khỏe nha — thành tích quan trọng, nhưng cậu khỏe mạnh vẫn là điều tớ mong nhất. Đừng cố quá rồi mệt, t sẽ lo đó :))</p>
+
+    <p class="reveal">Mong cậu không chỉ thi tốt hôm nay mà những ngày sau cũng luôn vui vẻ, mạnh khỏe, gặp nhiều điều tốt đẹp và từng bước đạt được những điều cậu mong muốn. Dù kết quả thế nào, tớ vẫn mong cậu tự hào vì những gì mình đã cố gắng.</p>
+
+    <p class="reveal">Và nhân ngày 20/10, chúc cô gái của tớ luôn xinh xắn, rạng rỡ, được yêu thương thật nhiều. Nhớ chăm sóc bản thân tử tế nha, đừng chỉ mải cố gắng mà quên nghỉ ngơi đó.</p>
+
+    <p class="reveal"><strong>Cố lên nhé, Châu! Tớ tin cậu làm được mà. 🐳🩵</strong></p>
+
+    <p class="signature reveal">Từ người luôn cổ vũ cậu ♡</p>
+
+    <div class="footer">Thi thật tốt, bình an trở về — tớ đợi tin vui của cậu.</div>
+  </article>
+</div>
+
+<script>
+const scene = document.getElementById("scene");
+const overlay = document.getElementById("overlay");
+const openBtn = document.getElementById("openBtn");
+const closeBtn = document.getElementById("closeBtn");
+let closeTimer;
+
+function openLetter() {
+  clearTimeout(closeTimer);
+
+  scene.classList.add("opening");
+  overlay.classList.remove("closing");
+  overlay.classList.add("show");
+
+  const paragraphs = document.querySelectorAll(".card p.reveal");
+
+  paragraphs.forEach((p, i) => {
+    p.style.opacity = "0";
+    p.style.transform = "translateY(10px)";
+    p.style.animation = "none";
+
+    setTimeout(() => {
+      p.style.animation = "lineIn .6s ease forwards";
+    }, 150 + i * 350);
+  });
+
+  makeFloats(18);
+  makeSparkles(14);
+}
+
+function closeLetter() {
+  if (!overlay.classList.contains("show")) return;
+
+  overlay.classList.remove("show");
+  overlay.classList.add("closing");
+
+  closeTimer = setTimeout(() => {
+    overlay.classList.remove("closing");
+    scene.classList.remove("opening");
+  }, 300);
+}
+
+openBtn.addEventListener("click", openLetter);
+closeBtn.addEventListener("click", closeLetter);
+
+overlay.addEventListener("click", event => {
+  if (event.target === overlay) closeLetter();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeLetter();
+});
+
+function makeFloats(amount = 5) {
+  const symbols = ["♡", "♥", "🌸", "🌷", "✿", "🩵", "✦"];
+
+  for (let i = 0; i < amount; i++) {
+    const item = document.createElement("span");
+    item.className = "float";
+    item.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    item.style.left = (Math.random() * 94 + 3) + "vw";
+    item.style.fontSize = (15 + Math.random() * 17) + "px";
+    item.style.animationDuration = (4 + Math.random() * 4) + "s";
+    item.style.animationDelay = (Math.random() * .5) + "s";
+
+    document.body.appendChild(item);
+    setTimeout(() => item.remove(), 9000);
+  }
+}
+
+function makeSparkles(amount = 8) {
+  for (let i = 0; i < amount; i++) {
+    const item = document.createElement("span");
+    item.className = "sparkle";
+    item.textContent = "✦";
+    item.style.left = (Math.random() * 90 + 5) + "vw";
+    item.style.top = (Math.random() * 80 + 5) + "vh";
+    item.style.color = ["#fff", "#83b8f2", "#f3aeca"][i % 3];
+    item.style.fontSize = (12 + Math.random() * 17) + "px";
+
+    document.body.appendChild(item);
+    setTimeout(() => item.remove(), 1400);
+  }
+}
+
+// Hoa và trái tim bay nhẹ liên tục
+setInterval(() => makeFloats(1), 1300);
+setInterval(() => makeSparkles(2), 2200);
+</script>
+</body>
+</html>
